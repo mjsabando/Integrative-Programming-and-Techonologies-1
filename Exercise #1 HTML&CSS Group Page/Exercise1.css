@@ -1,0 +1,110 @@
+﻿ body {
+            
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: white;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #ff4d88;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-weight: bold;
+            color: #ff4d88;
+            margin: 0;
+        }
+
+        .logo-placeholder {
+            
+            padding: 10px 20px;
+            font-size: clamp(0.8rem, 2vw, 1.2rem);
+            color: #ff4d88;
+            text-align: center;
+            
+        }
+        
+        .team-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            justify-items: center;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 300px;
+            text-align: center;
+        }
+
+        .profile-img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px; 
+            margin-bottom: 15px;
+            filter: grayscale(100%); 
+            transition: transform 0.3s ease, filter 0.3s ease;
+        }
+        
+        .profile-img:hover {
+            filter: grayscale(0%);
+            transform: scale(1.05);
+        }
+
+        .card h2 {
+            font-size: clamp(1rem, 2.5vw, 1.5rem);
+            color: #ff4d88;
+            margin: 10px 0;
+        }
+
+        .card p {
+            font-size: clamp(0.8rem, 2vw, 1rem);
+            color: #ffffff;
+            line-height: 1.5;
+            text-align: justify;
+            
+        }
+        
+        
+        body::before, body::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: clamp(50px, 10vw, 150px);
+            background: repeating-linear-gradient(
+                -45deg,
+                #ff4d88,
+                #ff4d88 10px,
+                transparent 10px,
+                transparent 20px
+            );
+            opacity: 0.1;
+            z-index: -1;
+        }
+
+        body::before {
+            left: 0;
+        }
+
+        body::after {
+            right: 0;
+        }

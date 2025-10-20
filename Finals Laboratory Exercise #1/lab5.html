@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Handling JSON Input</title>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+  </head>
+  <body class="scroll-smooth bg-gray-900 text-white min-h-screen">
+
+
+    <div id="auth-section" class="container mx-auto py-12 px-4 md:px-8">
+        <div class="bg-zinc-800 rounded-xl shadow-2xl p-8 flex flex-col items-center border border-amber-500/50">
+
+            <h3 class="text-3xl font-extrabold text-amber-400 mb-6" id="auth-title">Log In</h3>
+
+
+            <div class="w-full max-w-lg">
+                <form id="auth-form" class="flex flex-col space-y-4">
+                    <input type="text" id="username" name="username" placeholder="Username (e.g., admin)"  required class="p-3 rounded-md bg-zinc-700 text-white border border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-400">
+                    <input type="password" id="password" name="password" placeholder="Password (e.g., 1234)"  required class="p-3 rounded-md bg-zinc-700 text-white border border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-400">
+                    <input type="text" id="role" name="role" placeholder="Role (e.g., client/student/tester)"  class="p-3 rounded-md bg-zinc-700 text-white border border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-400">
+
+
+
+
+                    <button type="submit" id="auth-button" class="bg-amber-500 hover:bg-amber-600 text-black font-bold py-3 px-6 rounded-md transition-colors duration-200 shadow-md shadow-amber-500/50">Submit</button>
+
+                    <p id="message" class="text-center text-sm font-semibold"></p>
+                </form>
+            </div>
+
+            <div class="mt-8 w-full max-w-lg bg-zinc-900 p-6 rounded-lg border border-zinc-700">
+                <h4 class="text-xl font-bold text-teal-400 mb-3">Server Response Status:</h4>
+                <div id="responseStatus" class="mb-3 text-lg font-mono text-gray-300">Status: Waiting for input...</div>
+                <div id="responseMessage" class="text-green-400 font-semibold border-t border-zinc-700 pt-3">Message: Submit the form to test the API call.</div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+          // Get references to DOM elements
+          const form = document.getElementById('auth-form');
+          const submitBtn = document.getElementById('auth-button');
+          const messageElement = document.getElementById('message');
+          const responseStatusDiv = document.getElementById('responseStatus');
+          const responseMessageDiv = document.getElementById('responseMessage');
+
+          form.addEventListener('submit', function(event) {
+              event.preventDefault();
+
+              const data = {
+                  username: document.getElementById('username').value,
+                  password: document.getElementById('password').value,
+                  role: document.getElementById('role').value,
+              };
+
+              // --- Responsiveness Feedback (Start) ---
+              submitBtn.disabled = true;
+              submitBtn.textContent = 'Sending...';
+              responseStatusDiv.textContent = 'Status: PENDING';
+              responseStatusDiv.className = 'mb-3 text-lg font-mono text-yellow-500';
+              responseMessageDiv.innerHTML = '<strong>Message:</strong> Waiting for server response...';
+              responseMessageDiv.className = 'text-yellow-500 font-semibold border-t border-zinc-700 pt-3';
+              messageElement.textContent = '';
+              // --- Responsiveness Feedback (End) ---
+
+              // Use AJAX (fetch API) to send data to a PHP file.
+              fetch('lab5_api.php', {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(data)
+              })
+              .then(response => {
+                  if (!response.ok) {
+                      throw new Error(`HTTP error! Status: ${response.status}`);
+                  }
+                  return response.json();
+              })
+              .then(data => {
+                  // Display the JSON response in the webpage without reloading.
+                  if (data.status === 'success') {
+                      // Status line with line break and greeting
+                      responseStatusDiv.innerHTML = `Status: ${data.status.toUpperCase()}<br>Welcome, ${data.received_username}!`;
+                      responseStatusDiv.className = 'mb-3 text-lg font-mono text-green-500';
+
+                      // Display the received data in the responseMessageDiv
+                      responseMessageDiv.innerHTML = `
+                          <strong>Data Received:</strong>
+                          <ul class="list-disc ml-6 mt-1 font-normal text-green-500">
+                              <li>Username: <span class="font-mono">${data.received_username}</span></li>
+                              <li>Password: <span class="font-mono">${data.received_password}</span></li>
+                              <li>Role: <span class="font-mono">${data.received_role}</span></li>
+                          </ul>
+                      `;
+                      // Set class to teal for instructional look and keep the border
+                      responseMessageDiv.className = 'text-teal-400 font-semibold border-t border-zinc-700 pt-3';
+
+                      // Client-side confirmation message
+                      messageElement.textContent = `Data successfully received and processed by PHP.`;
+                      messageElement.className = 'text-center text-sm font-semibold text-green-500';
+
+                  } else {
+                       // Handle API-level errors (e.g., validation fail)
+                      responseStatusDiv.textContent = `Status: ${data.status.toUpperCase()}`;
+                      responseStatusDiv.className = 'mb-3 text-lg font-mono text-red-500';
+
+                      // On failure, we show the error message in red.
+                      responseMessageDiv.innerHTML = `<strong>Error:</strong> ${data.message}`;
+                      responseMessageDiv.className = 'text-red-400 font-semibold border-t border-zinc-700 pt-3';
+                      messageElement.textContent = 'Error during processing.';
+                      messageElement.className = 'text-center text-sm font-semibold text-red-500';
+                  }
+
+              })
+              .catch(error => {
+                  // Handle network or parsing errors
+                  responseStatusDiv.textContent = 'Status: FATAL ERROR';
+                  responseStatusDiv.className = 'mb-3 text-lg font-mono text-red-500';
+                  responseMessageDiv.innerHTML = `<strong>Details:</strong> Could not connect to API or parse response. (${error.message})`;
+                  responseMessageDiv.className = 'text-red-400 font-semibold border-t border-zinc-700 pt-3';
+                  messageElement.textContent = 'Fatal client-side error. Check console.';
+                  messageElement.className = 'text-center text-sm font-semibold text-red-500';
+                  console.error('Fetch error:', error);
+              })
+              .finally(() => {
+                  // Runs regardless of success or failure
+                  submitBtn.disabled = false;
+                  submitBtn.textContent = 'Send Data to PHP';
+              });
+          });
+      });
+    </script>
+
+</body>
+</html>

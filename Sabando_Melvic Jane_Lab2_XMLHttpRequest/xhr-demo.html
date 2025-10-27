@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="labstyle.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Exploring XMLHttpRequest</title>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+  </head>
+  <body class="scroll-smooth bg-gray-900 text-white min-h-screen flex items-start " >
+
+    <div class="container mx-auto py-12 px-4 md:px-80">
+      <div class="w-full max-w-xl bg-zinc-800 rounded-xl shadow-2xl p-8 flex flex-col items-center border border-amber-500/50">
+        <h1 class="text-3xl font-extrabold text-amber-400 mb-6 text-center">Exploring XMLHttpRequest</h1>
+
+        <!-- Button to trigger the request -->
+        <button id="loadButton" onclick="loadPost()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 active:bg-blue-800">
+            Load Post Data
+        </button>
+
+        <!-- Loading/Status Message Area -->
+        <p id="statusMessage" class="mt-4 text-center text-sm text-gray-500 hidden">Loading...</p>
+
+        <!-- Card to display the fetched data -->
+        <div id="output" class="bg-zinc-900 p-4 rounded-lg border  border-zinc-700 mt-8 p-5 shadow-inner hidden">
+            <div id="postTitle" class="text-xl font-bold text-amber-500 mb-2"></div>
+            <div id="postBody" class="text-gray-400 leading-relaxed border-t pt-3 mt-3 border-indigo-200"></div>
+            <div class="mt-4 text-xs font-mono text-green-500">User ID: <span id="postUserId"></span></div>
+        </div>
+
+        <!-- Error message box -->
+        <div id="errorBox" class="mt-8 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg hidden" role="alert">
+            <span class="font-bold">Error:</span> <span id="errorMessage"></span>
+        </div>
+    </div>
+
+    <script>
+        const loadButton = document.getElementById('loadButton');
+        const statusMessage = document.getElementById('statusMessage');
+        const output = document.getElementById('output');
+        const postTitle = document.getElementById('postTitle');
+        const postBody = document.getElementById('postBody');
+        const postUserId = document.getElementById('postUserId');
+        const errorBox = document.getElementById('errorBox');
+        const errorMessage = document.getElementById('errorMessage');
+
+        /**
+         * Clears previous output and displays loading state.
+         */
+        function setLoadingState(isLoading, message = 'Loading...') {
+            loadButton.disabled = isLoading;
+            loadButton.textContent = isLoading ? 'Fetching...' : 'Load Post Data';
+            statusMessage.textContent = message;
+            statusMessage.classList.toggle('hidden', !isLoading);
+            output.classList.add('hidden');
+            errorBox.classList.add('hidden');
+        }
+
+        /**
+         * Sends the GET request using XMLHttpRequest.
+         */
+        function loadPost() {
+            setLoadingState(true);
+
+            // Create a new XMLHttpRequest object
+            const xhr = new XMLHttpRequest();
+            const url = 'https://jsonplaceholder.typicode.com/posts/97';
+
+            // Specify the request type and URL
+            xhr.open('GET', url);
+
+            // Define the function to run when the request completes
+            xhr.onload = function() {
+                setLoadingState(false, ''); // Clear loading state regardless of success/fail
+
+                // Check if the request was successful (status 200)
+                if (xhr.status === 200) {
+                    try {
+                        // Parse the JSON data
+                        const responseData = JSON.parse(xhr.responseText);
+
+                        // Update the DOM with the fetched data
+                        postTitle.textContent = responseData.title;
+                        postBody.textContent = responseData.body;
+                        postUserId.textContent = responseData.userId;
+
+                        // Show the result card
+                        output.classList.remove('hidden');
+
+                    } catch (e) {
+                        // Handle JSON parsing error
+                        errorMessage.textContent = 'Failed to parse JSON response.';
+                        errorBox.classList.remove('hidden');
+                        console.error('JSON Parse Error:', e);
+                    }
+                } else {
+                    // Handle HTTP error statuses
+                    errorMessage.textContent = `Request failed with status code ${xhr.status}.`;
+                    errorBox.classList.remove('hidden');
+                    console.error('Request failed. Status:', xhr.status);
+                }
+            };
+
+            // Define the function to run if there is a network error
+            xhr.onerror = function() {
+                setLoadingState(false, '');
+                errorMessage.textContent = 'A network error occurred. Check your connection.';
+                errorBox.classList.remove('hidden');
+                console.error('Network error occurred.');
+            };
+
+            // Send the request
+            xhr.send();
+            console.log('GET request initiated for:', url);
+        }
+    </script>
+</body>
+</html>

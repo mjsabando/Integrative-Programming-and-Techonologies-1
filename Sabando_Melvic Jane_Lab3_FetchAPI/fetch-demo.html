@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Exploring the Fetch API</title>
+    <style>
+
+        :root {
+            --primary: #fbbf24;
+            --secondary: #1f2937;
+            --text-light: #f3f4f6;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        .get-btn { background-color: #3b82f6; }
+        .post-btn { background-color: #10b981; }
+        .get-btn:hover { background-color: #2563eb; }
+        .post-btn:hover { background-color: #059669; }
+    </style>
+  </head>
+  <body class="scroll-smooth bg-gray-900 text-white min-h-screen flex items-start" >
+
+    <div class="container mx-auto py-12 px-4 md:px-80">
+      <div class="w-full max-w-xl bg-zinc-800 rounded-xl shadow-2xl p-8 flex flex-col items-center border border-amber-500/50">
+        <h1 class="text-3xl font-extrabold text-amber-400 mb-6 text-center">Exploring the Fetch API</h1>
+
+        <!-- Buttons to trigger the requests -->
+        <div class="w-full space-y-4">
+            <button id="getButton" onclick="getPost()" class="get-btn w-full text-white font-semibold py-3 px-4 rounded-lg transition duration-200 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 active:bg-blue-800">
+                Load Post Data
+            </button>
+            <button id="postButton" onclick="createPost()" class="post-btn w-full text-white font-semibold py-3 px-4 rounded-lg transition duration-200 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 active:bg-emerald-700">
+                POST
+            </button>
+        </div>
+
+        <!-- Loading/Status Message Area -->
+        <p id="statusMessage" class="mt-4 text-center text-sm text-gray-500 hidden">Loading...</p>
+
+        <!-- Card to display the fetched data -->
+        <div id="output" class="bg-zinc-900 p-4 rounded-lg border border-zinc-700 mt-8 p-5 shadow-inner hidden">
+            <div id="postTitle" class="text-xl font-bold text-amber-500 mb-2"></div>
+            <div id="postBody" class="text-gray-400 leading-relaxed border-t pt-3 mt-3 border-zinc-700"></div>
+            <div class="mt-4 text-xs font-mono text-green-500">User ID: <span id="postUserId"></span> | Response ID: <span id="responseId">N/A</span></div>
+        </div>
+
+        <!-- Error message box -->
+        <div id="errorBox" class="mt-8 p-4 bg-red-900/50 border border-red-500 text-red-300 rounded-lg hidden" role="alert">
+            <span class="font-bold">Error:</span> <span id="errorMessage"></span>
+        </div>
+    </div>
+
+    <script>
+        const getButton = document.getElementById('getButton');
+        const postButton = document.getElementById('postButton');
+        const statusMessage = document.getElementById('statusMessage');
+        const output = document.getElementById('output');
+        const postTitle = document.getElementById('postTitle');
+        const postBody = document.getElementById('postBody');
+        const postUserId = document.getElementById('postUserId');
+        const responseId = document.getElementById('responseId');
+        const errorBox = document.getElementById('errorBox');
+        const errorMessage = document.getElementById('errorMessage');
+
+        const POST_URL = 'https://jsonplaceholder.typicode.com/posts/';
+        const GET_URL = 'https://jsonplaceholder.typicode.com/posts/97';
+
+        // Data payload for the POST request
+        const postData = {
+            title: "My New Post",
+            body: "Learning Fetch API is fun!",
+            userId: 1
+        };
+
+        /**
+         * Clears previous output and displays loading state for the triggered button.
+         */
+        function setLoadingState(buttonElement, isLoading, message) {
+            getButton.disabled = isLoading;
+            postButton.disabled = isLoading;
+
+            // Update the specific button that was pressed
+            if (isLoading) {
+                buttonElement.textContent = 'Fetching...';
+            } else if (buttonElement.id === 'getButton') {
+                getButton.textContent = 'Load Post Data';
+            } else if (buttonElement.id === 'postButton') {
+                postButton.textContent = 'POST';
+            }
+
+            statusMessage.textContent = message || '';
+            statusMessage.classList.toggle('hidden', !isLoading);
+            output.classList.add('hidden');
+            errorBox.classList.add('hidden');
+
+            // Clear previous response ID
+            responseId.textContent = 'N/A';
+        }
+
+        /**
+         * Generic function to handle successful data display.
+         */
+        function displayData(data, isPost = false) {
+            postTitle.textContent = data.title;
+            postBody.textContent = data.body;
+            postUserId.textContent = data.userId;
+
+            // Display the ID only if it was a POST request
+            if (isPost && data.id) {
+                responseId.textContent = data.id;
+                statusMessage.textContent = `✅ POST Successful! New ID: ${data.id}`;
+                statusMessage.classList.remove('text-gray-500');
+                statusMessage.classList.add('text-green-500');
+            } else if (!isPost) {
+                statusMessage.textContent = '✅ GET Successful!';
+                statusMessage.classList.remove('text-gray-500');
+                statusMessage.classList.add('text-blue-400');
+            }
+
+            // Show the result card and hide loading message
+            statusMessage.classList.remove('hidden');
+            output.classList.remove('hidden');
+        }
+
+        /**
+         * Sends a GET request using the Fetch API.
+         */
+        function getPost() {
+            setLoadingState(getButton, true, 'Sending GET request...');
+
+            fetch(GET_URL)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Server returned status: ${response.status}`);
+                    }
+                    return response.json(); // Convert response to JSON
+                })
+                .then(data => {
+                    setLoadingState(getButton, false);
+                    displayData(data, false); // Display title and body
+                })
+                .catch(error => {
+                    // Handle errors gracefully
+                    setLoadingState(getButton, false);
+                    errorMessage.textContent = `GET failed. Details: ${error.message}`;
+                    errorBox.classList.remove('hidden');
+                    console.error('Fetch GET Error:', error);
+                });
+        }
+
+        /**
+         * Sends a POST request using the Fetch API.
+         */
+        function createPost() {
+            setLoadingState(postButton, true, 'Sending POST request...');
+
+            fetch(POST_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(postData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Server returned status: ${response.status}`);
+                }
+                return response.json(); // Convert response to JSON
+            })
+            .then(data => {
+                setLoadingState(postButton, false);
+                displayData(data, true); // Display title, body, and Response ID
+            })
+            .catch(error => {
+                // Handle errors gracefully
+                setLoadingState(postButton, false);
+                errorMessage.textContent = `POST failed. Details: ${error.message}`;
+                errorBox.classList.remove('hidden');
+                console.error('Fetch POST Error:', error);
+            });
+        }
+    </script>
+  </body>
+</html>

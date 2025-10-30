@@ -1,0 +1,22 @@
+Guide Questions
+
+1. What are the main differences between XMLHttpRequest and Fetch API?
+
+~ XMLHttpRequest is Event-based it relies on managing complex internal states and listening for multiple events like onload, onerror, onreadystatechange. It sequencing multiple requests or handling different error types required intricate, nested logic. While, Fetch API is Promise-based it uses native JavaScript Promises. It completely changes the way you structure asynchronous code, it allows you to chain operations sequentially using simple methods like .then() and .catch().
+
+
+2. Why is the Fetch API considered more modern and readable?
+
+~ Fetch is generally preferred because it uses Promises, which is the modern standard for handling asynchronous code, unlike the older, event-based XMLHttpRequest (XHR). This makes the code much cleaner and more readable by creating a clear, linear flow: send the request, then handle the response, then process the data. It's also much simpler to configure complex requests, and it works perfectly with the elegant async/await syntax.
+
+
+
+3. What is the purpose of the .then() and .catch() methods in Fetch?
+
+
+~ The fetch() function immediately returns a Promise, which is like a placeholder for future data. We use the .then() method to define the success path: the first .then() checks for basic HTTP errors (like a 404) and parses the data stream with response.json(), and the next .then() receives the final, usable data. If anything goes wrong—like a network failure or an error we manually throw—the entire process jumps straight to the .catch() method, allowing us to handle all errors gracefully in one place.
+
+
+4. What happens when you send a POST request to the placeholder API?
+
+~ When you click the "POST New Post" button, your browser shoots your new post data over to the JSONPlaceholder API. Since that site is just a sandbox, it doesn't actually file away your data permanently. Instead, it instantly responds with a success signal (201 Created) and sends back your original data, but with a special addition: a brand new, unique identifier, like id: 101. This is how it cleverly pretends to be a real server that just finished creating a new record for you!

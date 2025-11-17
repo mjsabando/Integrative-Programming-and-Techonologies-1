@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<students>
+<student>
+<id>001</id>
+<name>Jean Calvin Nueva</name>
+<course>BSIT</course>
+<year>3</year>
+</student>
+<student>
+<id>002</id>
+<name>Ryhea Jean Quita</name>
+<course>BSIT</course>
+<year>3</year>
+</student>
+<student>
+<id>003</id>
+<name>Melvic Jane Sabando</name>
+<course>BSIT</course>
+<year>3</year>
+</student>
+<student>
+<id>004</id>
+<name>Krisalyn Sama</name>
+<course>BSIT</course>
+<year>2</year>
+</student>
+</students>

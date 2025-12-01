@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency Exchange Application</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="glass-container">
+        <header>
+            <h1>Currency Exchange</h1>
+            <p class="subtitle">Real-time global rates</p>
+        </header>
+
+        <form>
+            <div class="amount-section">
+                <label>Amount</label>
+                <input type="number" value="1" id="amount-input">
+            </div>
+
+            <div class="conversion-group">
+                <div class="currency-wrapper">
+                    <label>From</label>
+                    <div class="custom-dropdown" id="from-dropdown">
+                        <div class="selected-option">
+                            <img src="https://flagsapi.com/US/flat/64.png" alt="flag" class="flag-img">
+                            <span class="currency-code">USD</span>
+                            <i class="fa-solid fa-chevron-down arrow"></i>
+                        </div>
+                        <div class="options-container hidden">
+                            <div class="search-box">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <input type="text" placeholder="Search country or currency...">
+                            </div>
+                            <ul class="options-list">
+                                </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="swap-icon">
+                    <i class="fa-solid fa-arrow-right-arrow-left"></i>
+                </div>
+
+                <div class="currency-wrapper">
+                    <label>To</label>
+                    <div class="custom-dropdown" id="to-dropdown">
+                        <div class="selected-option">
+                            <img src="https://flagsapi.com/PH/flat/64.png" alt="flag" class="flag-img">
+                            <span class="currency-code">PHP</span>
+                            <i class="fa-solid fa-chevron-down arrow"></i>
+                        </div>
+                        <div class="options-container hidden">
+                            <div class="search-box">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <input type="text" placeholder="Search country or currency...">
+                            </div>
+                            <ul class="options-list">
+                                </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="result-box">
+                <p class="msg">1 USD = ... PHP</p>
+                <p class="last-updated">Updating...</p>
+            </div>
+
+            <button id="get-rate-btn">Get Exchange Rate</button>
+        </form>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
